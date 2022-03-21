@@ -1,28 +1,26 @@
-project(screen_capture_lite)
-
 if(WIN32)
-    set(SCREEN_CAPTURE_PLATFORM_SRC     
+    set(SCREEN_CAPTURE_PLATFORM_SRC
 		windows/GetWindows.cpp
-		windows/GetMonitors.cpp 
-		windows/DXFrameProcessor.cpp 
+		windows/GetMonitors.cpp
+		windows/DXFrameProcessor.cpp
 		../include/windows/DXFrameProcessor.h
-		windows/GDIFrameProcessor.cpp 
+		windows/GDIFrameProcessor.cpp
 		../include/windows/GDIFrameProcessor.h
 		windows/GDIMouseProcessor.cpp
 		../include/windows/GDIMouseProcessor.h
 		windows/ThreadRunner.cpp
 		../include/windows/GDIHelpers.h
     )
-    set(SCREEN_CAPTURE_PLATFORM_INC     
-       ../include/windows 
+    set(SCREEN_CAPTURE_PLATFORM_INC
+       ../include/windows
     )
 	add_definitions(-DNOMINMAX)
 elseif(APPLE)
 
     set(SCREEN_CAPTURE_PLATFORM_SRC
-        ios/GetWindows.cpp 
+        ios/GetWindows.cpp
         ios/NSMouseCapture.m
-        ../include/ios/NSMouseCapture.h 
+        ../include/ios/NSMouseCapture.h
         ios/NSFrameProcessor.cpp
         ios/NSFrameProcessor.mm
         ../include/ios/NSFrameProcessorm.h
@@ -35,13 +33,13 @@ elseif(APPLE)
         ios/ThreadRunner.cpp
     )
     set(SCREEN_CAPTURE_PLATFORM_INC
-       ../include/ios 
+       ../include/ios
     )
 else()
-  set(SCREEN_CAPTURE_PLATFORM_SRC 
-       ../include/linux/X11MouseProcessor.h 
-       linux/X11MouseProcessor.cpp 
-       ../include/linux/X11FrameProcessor.h 
+  set(SCREEN_CAPTURE_PLATFORM_SRC
+       ../include/linux/X11MouseProcessor.h
+       linux/X11MouseProcessor.cpp
+       ../include/linux/X11FrameProcessor.h
        linux/X11FrameProcessor.cpp
        linux/GetMonitors.cpp
        linux/GetWindows.cpp
@@ -55,20 +53,20 @@ else()
  		message(FATAL_ERROR "X11 fixes extension is required, but not found!")
 	endif()
 	set(SCREEN_CAPTURE_PLATFORM_INC
-       ../include/linux 
+       ../include/linux
 		${X11_INCLUDE_DIR}
     )
 endif()
 
 
 include_directories(
-	../include 
+	../include
 	${SCREEN_CAPTURE_PLATFORM_INC}
 )
 
-set(libsrc 
-	../include/ScreenCapture.h 
-		../include/internal/SCCommon.h 
+set(libsrc
+	  ../include/ScreenCapture.h
+		../include/internal/SCCommon.h
 		../include/internal/ThreadManager.h
 		ScreenCapture.c
 		ScreenCapture.cpp
@@ -77,17 +75,15 @@ set(libsrc
 		${SCREEN_CAPTURE_PLATFORM_SRC}
 )
 
-message("Building STATIC Library")
-add_library(${PROJECT_NAME}_static STATIC ${libsrc})
-
-  message("Building SHARED Library")
+# message("Building STATIC Library")
+# add_library(${PROJECT_NAME}_static STATIC ${libsrc})
   
-    add_library(${PROJECT_NAME}_shared SHARED ${libsrc} ../include/ScreenCapture_C_API.h)
+    add_library(${PROJECT_NAME} ${libsrc} ../include/ScreenCapture_C_API.h)
 
-	set_target_properties(${PROJECT_NAME}_shared PROPERTIES DEFINE_SYMBOL SC_LITE_DLL)
+	set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL SC_LITE_DLL)
 	 if(WIN32) 
-		target_link_libraries(${PROJECT_NAME}_shared Dwmapi)
-		install (FILES $<TARGET_PDB_FILE:${PROJECT_NAME}_shared> DESTINATION bin OPTIONAL)
+		target_link_libraries(${PROJECT_NAME} Dwmapi)
+		install (FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> DESTINATION bin OPTIONAL)
 	elseif(APPLE)
 		find_package(Threads REQUIRED)
         find_library(corefoundation_lib CoreFoundation REQUIRED)
@@ -98,7 +94,7 @@ add_library(${PROJECT_NAME}_static STATIC ${libsrc})
         find_library(corevideo_lib CoreVideo REQUIRED)
        
         target_link_libraries(
-           ${PROJECT_NAME}_shared
+           ${PROJECT_NAME}
             ${CMAKE_THREAD_LIBS_INIT}
             ${corefoundation_lib}
             ${cocoa_lib}
@@ -117,7 +113,7 @@ add_library(${PROJECT_NAME}_static STATIC ${libsrc})
 		endif()
 		find_package(Threads REQUIRED)
 		target_link_libraries(
-            ${PROJECT_NAME}_shared
+            ${PROJECT_NAME}
 			${X11_LIBRARIES}
 			${X11_Xfixes_LIB}
 			${X11_XTest_LIB}
@@ -125,4 +121,3 @@ add_library(${PROJECT_NAME}_static STATIC ${libsrc})
 			${CMAKE_THREAD_LIBS_INIT}
 		)	 
 	endif()
-  

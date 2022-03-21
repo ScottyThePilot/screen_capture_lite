@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
-project(screen_capture_lite_build)
+project(screen_capture_lite VERSION 17.1.457)
+set(namespace "ScreenCaptureLite")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF) 
-option(BUILD_EXAMPLE "Build example" ON)
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
+option(BUILD_EXAMPLE "Build example" OFF)
+# set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
@@ -21,18 +22,111 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
 endif()
 
-add_subdirectory(src_cpp) 
-add_subdirectory(src_csharp) 
+add_subdirectory(src_cpp)
 
-install (TARGETS screen_capture_lite_static screen_capture_lite_shared 
+set(IOS_HEADERS
+  include/ios/CGFrameProcessor.h
+  include/ios/NSFrameProcessor.h
+  include/ios/NSFrameProcessorm.h
+  include/ios/NSMouseCapture.h
+  include/ios/NSMouseProcessor.h
+)
+
+set(LINUX_HEADERS
+  include/linux/X11FrameProcessor.h
+  include/linux/X11MouseProcessor.h
+)
+
+set(WINDOWS_HEADERS
+  include/windows/DXFrameProcessor.h
+  include/windows/GDIFrameProcessor.h
+  include/windows/GDIHelpers.h
+  include/windows/GDIMouseProcessor.h
+)
+
+set(PUBLIC_HEADERS
+  include/ScreenCapture_C_API.h
+  include/ScreenCapture.h
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADERS}")
+
+target_include_directories(${PROJECT_NAME}
+PRIVATE
+  include
+PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+get_target_property(target_type ${PROJECT_NAME} TYPE)
+
+IF (${target_type} STREQUAL "STATIC_LIBRARY")
+  set(LIB_SUFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
+ELSE()
+  set(LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+ENDIF()
+
+message(STATUS "${target_type}")
+message(STATUS "Suffix: ${LIB_SUFFIX}")
+
+set(INCLUDE_INSTALL_DIR include/${PROJECT_NAME})
+set(LIB_INSTALL_DIR lib)
+
+install (TARGETS ${PROJECT_NAME}
+  EXPORT "${PROJECT_NAME}Targets"
 	RUNTIME DESTINATION bin
-	ARCHIVE DESTINATION lib
-	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}
+  INCLUDES DESTINATION ${INCLUDE_INSTALL_DIR}
 )
  
-install (FILES 
-	include/ScreenCapture.h 
-	DESTINATION include
+
+install(EXPORT "${PROJECT_NAME}Targets"
+    FILE "${PROJECT_NAME}Targets.cmake"
+    NAMESPACE ${namespace}::
+    DESTINATION lib/cmake/${PROJECT_NAME}
+)
+
+include(CMakePackageConfigHelpers)
+
+# generate the version file for the config file
+write_basic_config_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  VERSION "${VERSION}"
+  COMPATIBILITY AnyNewerVersion
+)
+# create config file
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+  INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
+  PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR LIB_SUFFIX
+)
+# install config file
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  DESTINATION ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}
+)
+
+install(FILES
+  ${WINDOWS_HEADERS}
+  DESTINATION ${INCLUDE_INSTALL_DIR}/windows
+  COMPONENT Headers
+)
+
+install(FILES
+  ${LINUX_HEADERS}
+  DESTINATION ${INCLUDE_INSTALL_DIR}/linux
+  COMPONENT Headers
+)
+
+install(FILES
+  ${IOS_HEADERS}
+  DESTINATION ${INCLUDE_INSTALL_DIR}/ios
+  COMPONENT Headers
 )
 
 if (NOT TARGET uninstall)
@@ -48,8 +142,5 @@ endif()
 enable_testing() 
 
 if (${BUILD_EXAMPLE})
-  add_subdirectory(Example_OpenGL) 
-  add_subdirectory(Example_CPP) 
-  add_subdirectory(Example_CSharp) 
-  add_subdirectory(Example_Unity) 
+  add_subdirectory(Example_CPP)
 endif()
