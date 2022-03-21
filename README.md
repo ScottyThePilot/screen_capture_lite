@@ -1,6 +1,6 @@
-<img src="Logotype primary.png" width="60%" height="60%" />
+<p>Barebone fork of the C++ screencapture library included in https://github.com/smasherprog/screen_capture_lite</p>
+<p>I removed everything that is not C++ related to keep the repository small</p>
 
-<p>Above Logo created by https://github.com/mansya</p>
 <p>Master is where development happens and should NOT be considered stable. Use tags for stable releases.</p> 
 <p>Window/Linux/Mac <img src="https://smasherprog.visualstudio.com/Smasherprog_projects/_apis/build/status/smasherprog.screen_capture_lite?branchName=master"/><p>
 <p>Cross-platform screen and window capturing library<p>
@@ -66,59 +66,6 @@ windowframgrabber->SCL_SetMouseChangeInterval(std::chrono::milliseconds(100));//
 
 ```
 
-
-c#
-<p>https://github.com/smasherprog/screen_capture_lite/blob/master/Example_CSharp/Program.cs</p>
-
-```c#
-//Setup Screen Capture for all monitors
-var framgrabber = SL.Screen_Capture.CaptureConfiguration.CreateCaptureConfiguration(() =>
-{
-   var mons = SL.Screen_Capture.SCL_GetMonitors();
-   Console.WriteLine("Library is requesting the list of monitors to capture!");
-   for (int i = 0; i < mons.Length; ++i)
-   {
-	   WriteLine( mons[i]);
-   }
-   return mons;
-}).onNewFrame(( SL.Screen_Capture.Image img,  SL.Screen_Capture.Monitor monitor) =>
-{
-
-}).onFrameChanged(( SL.Screen_Capture.Image img,  SL.Screen_Capture.Monitor monitor) =>
-{
-
-}).onMouseChanged((SL.Screen_Capture.Image img, SL.Screen_Capture.MousePoint mousePoint) =>
-{ 
-
-}).start_capturing();
-framgrabber.SCL_SetFrameChangeInterval(100);
-framgrabber.SCL_SetMouseChangeInterval(100);
-
-
-//Setup Screen Capture for windows that have the title "google" in it
-var framgrabber = SL.Screen_Capture.CaptureConfiguration.CreateCaptureConfiguration(() =>
-{
-	var windows = SL.Screen_Capture.SCL_GetWindows();
-	Console.WriteLine("Library is requesting the list of windows to capture!");
-	for (int i = 0; i < windows.Length; ++i)
-	{
-		WriteLine(windows[i]);
-	}
-	return windows.Where(a => a.Name.ToLower().Contains("google")).ToArray();
-}).onNewFrame(( SL.Screen_Capture.Image img,  SL.Screen_Capture.Window monitor) =>
-{ 
-
-}).onFrameChanged(( SL.Screen_Capture.Image img,  SL.Screen_Capture.Window monitor) =>
-{ 
-}).onMouseChanged(( SL.Screen_Capture.Image img,  SL.Screen_Capture.MousePoint mousePoint) =>
-{
-	  
-}).start_capturing();
-
-framgrabber.SCL_SetFrameChangeInterval(100);
-framgrabber.SCL_SetMouseChangeInterval(100);
-
-```
 <h3>Library Usage</h3>
 <p>Only define what are are interested in. Do not define a callback for onMouseChanged if you dont want that information. If you do, the library will assume that you want mouse information and monitor that --so DONT!</p>
 <p>Again, DONT DEFINE CALLBACKS FOR EVENTS YOU DONT CARE ABOUT. If you do, the library will do extra work assuming you want the information.</p>
