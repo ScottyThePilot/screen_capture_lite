@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.20)
 project(screen_capture_example_cpp)
 
 if(WIN32)
@@ -39,24 +40,21 @@ else()
 	)
 endif()
 
+find_package(screen_capture_lite REQUIRED)
+
 include_directories(
-	../include 
-) 
-
-add_executable(${PROJECT_NAME}_static
-	lodepng.cpp
-	Screen_Capture_Example.cpp
+	${screen_capture_lite_INCLUDE_DIR}
+#	../include
 )
-target_link_libraries(${PROJECT_NAME}_static screen_capture_lite_static ${${PROJECT_NAME}_PLATFORM_LIBS})  
 
-add_executable(${PROJECT_NAME}_shared  
+add_executable(${PROJECT_NAME}
 	lodepng.cpp
 	Screen_Capture_Example.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_shared screen_capture_lite_shared ${${PROJECT_NAME}_PLATFORM_LIBS}) 
+target_link_libraries(${PROJECT_NAME} ${screen_capture_lite_LIBRARIES} ${${PROJECT_NAME}_PLATFORM_LIBS}) 
 
-install (TARGETS ${PROJECT_NAME}_static ${PROJECT_NAME}_shared screen_capture_lite_shared
+install (TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION Examples
 ) 
   

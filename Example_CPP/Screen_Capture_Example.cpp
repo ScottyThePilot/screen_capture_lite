@@ -1,4 +1,4 @@
-#include "ScreenCapture.h"
+#include <ScreenCapture.h>
 #include "ScreenCapture_C_API.h"
 #include "internal/SCCommon.h" //DONT USE THIS HEADER IN PRODUCTION CODE!!!! ITS INTERNAL FOR A REASON IT WILL CHANGE!!! ITS HERE FOR TESTS ONLY!!!
 #include <algorithm>
@@ -429,16 +429,16 @@ int main()
     framgrabber->resume();
     std::this_thread::sleep_for(std::chrono::seconds(5));
 
-    std::cout << "Testing changing the interval during runtime for race conditions " << std::endl;
+    // std::cout << "Testing changing the interval during runtime for race conditions " << std::endl;
 
-    // HAMMER THE SET FRAME INTERVAL FOR RACE CONDITIONS!!
-    auto start = std::chrono::high_resolution_clock::now();
-    while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start).count() < 10) {
-        for (auto t = 0; t < 100; t++) {
-            framgrabber->setFrameChangeInterval(std::chrono::microseconds(100));
-            framgrabber->setMouseChangeInterval(std::chrono::microseconds(100));
-        }
-    }
+    // // HAMMER THE SET FRAME INTERVAL FOR RACE CONDITIONS!!
+    // auto start = std::chrono::high_resolution_clock::now();
+    // while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start).count() < 10) {
+    //     for (auto t = 0; t < 100; t++) {
+    //         framgrabber->setFrameChangeInterval(std::chrono::microseconds(100));
+    //         framgrabber->setMouseChangeInterval(std::chrono::microseconds(100));
+    //     }
+    // }
 
     std::cout << "Changing the cpature rate to 1 second" << std::endl;
     framgrabber->setFrameChangeInterval(std::chrono::seconds(1));
