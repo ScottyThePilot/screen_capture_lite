@@ -4,7 +4,7 @@ set(namespace "ScreenCaptureLite")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF) 
+set(CMAKE_CXX_EXTENSIONS OFF)
 option(BUILD_EXAMPLE "Build example" OFF)
 # set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -52,20 +52,16 @@ set(PUBLIC_HEADERS
 set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
 target_include_directories(${PROJECT_NAME}
-PRIVATE
-  include
-PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  PRIVATE
+    include
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 get_target_property(target_type ${PROJECT_NAME} TYPE)
 
-IF (${target_type} STREQUAL "STATIC_LIBRARY")
-  set(LIB_SUFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
-ELSE()
-  set(LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
-ENDIF()
+set(LIB_SUFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 message(STATUS "${target_type}")
 message(STATUS "Suffix: ${LIB_SUFFIX}")
@@ -81,12 +77,11 @@ install (TARGETS ${PROJECT_NAME}
   PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}
   INCLUDES DESTINATION ${INCLUDE_INSTALL_DIR}
 )
- 
 
 install(EXPORT "${PROJECT_NAME}Targets"
-    FILE "${PROJECT_NAME}Targets.cmake"
-    NAMESPACE ${namespace}::
-    DESTINATION lib/cmake/${PROJECT_NAME}
+  FILE "${PROJECT_NAME}Targets.cmake"
+  NAMESPACE ${namespace}::
+  DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
 include(CMakePackageConfigHelpers)
@@ -97,6 +92,7 @@ write_basic_config_version_file(
   VERSION "${VERSION}"
   COMPATIBILITY AnyNewerVersion
 )
+
 # create config file
 configure_package_config_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
@@ -104,6 +100,7 @@ configure_package_config_file(
   INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
   PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR LIB_SUFFIX
 )
+
 # install config file
 install(FILES
   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
@@ -133,14 +130,12 @@ if (NOT TARGET uninstall)
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
+    IMMEDIATE @ONLY
+  )
 
   add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+  )
 endif()
 
-enable_testing() 
-
-if (${BUILD_EXAMPLE})
-  add_subdirectory(Example_CPP)
-endif()
+enable_testing()
