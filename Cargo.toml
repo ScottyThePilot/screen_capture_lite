@@ -1,0 +1,11 @@
+[package]
+name = "screen_capture_lite"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "screen_capture_lite"
+path = "src_rs/lib.rs"
+
+[build-dependencies]
+cmake = "0.1.48"

@@ -242,3 +242,8 @@ cmake_uninstall.cmake
 CMakeSettings.json
 *.dll
 *.sh
+
+# Added by cargo
+
+/target
+/Cargo.lock
